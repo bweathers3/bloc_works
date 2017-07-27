@@ -1,4 +1,3 @@
-
 class Object
 
   def self.const_missing(const)

@@ -1,4 +1,3 @@
-
 module BlocWorks
 
   class Application
@@ -16,6 +15,6 @@ module BlocWorks
         return [404, {'Content-Type' => 'text/html'}, []]
       end
     end
-    
+
   end
 end

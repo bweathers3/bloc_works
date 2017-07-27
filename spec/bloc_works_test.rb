@@ -11,7 +11,7 @@ class BlocWorksTest < Test::Unit::TestCase
   end
 
   def test_call
-    get "/"
+    get ""
     assert last_response.ok?
     assert_equal "Hello Blocheads!", last_response.body
   end

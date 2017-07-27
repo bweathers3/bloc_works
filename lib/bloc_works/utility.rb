@@ -1,4 +1,3 @@
-
 module BlocWorks
 
   def self.snake_case(camel_cased_word)
