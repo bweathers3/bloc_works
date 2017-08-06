@@ -1,5 +1,6 @@
 
 require "erubis"
+require "pry"
 
 module BlocWorks
 
@@ -10,16 +11,18 @@ module BlocWorks
     end
 
     def render(view, locals = {})
-      puts "def render(view, locals = {}) vars:    #{view} and #{locals}"
+
+      #puts "def render(view, locals = {}) vars:    #{view} and #{locals}"
       filename = File.join("app", "views", controller_dir, "#{view}.html.erb")
       template = File.read(filename)
       eruby = Erubis::Eruby.new(template)
+        binding.pry
       eruby.result(locals.merge(env: @env))
     end
 
 
     def controller_dir
-      puts "IN def controller_dir"
+      #puts "IN def controller_dir"
       klass = self.class.to_s
       klass.slice!("Controller")
       BlocWorks.snake_case(klass)

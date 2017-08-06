@@ -8,7 +8,8 @@ require "bloc_works/dependencies"
 module BlocWorks
   class Application
     def call(env)
-       puts "env: #{env}"
+        #binding.pry
+       #puts "env: #{env}"
       [200, {'Content-Type' => 'text/html'}, ["Hello Blocheads 123!"]]
     end
   end
