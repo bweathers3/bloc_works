@@ -9,9 +9,13 @@ module BlocWorks
     end
 
     def render(view, locals = {})
+      puts "view, locals : #{view}     #{locals}"
       filename = File.join("app", "views", controller_dir, "#{view}.html.erb")
       template = File.read(filename)
       eruby = Erubis::Eruby.new(template)
+      puts "%%%%%%%%%%%%"
+      puts " #{eruby.result(locals.merge(env: @env))}"
+      puts "%%%%%%%%%%%%"
       eruby.result(locals.merge(env: @env))
     end
 
@@ -19,6 +23,9 @@ module BlocWorks
     def controller_dir
       klass = self.class.to_s
       klass.slice!("Controller")
+      puts "from controller dir %%%%%%%%%%%%"
+      puts "%%%%%%%%%%%%"
+      puts "#{BlocWorks.snake_case(klass)}"
       BlocWorks.snake_case(klass)
     end
 
