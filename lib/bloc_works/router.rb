@@ -19,7 +19,6 @@ module BlocWorks
       # puts "from fav_icon"
       # puts "%%%%%%%%%%%%"
       # puts "env : #{env}"
-      # puts "%%%%%%%%%%%%"
       if env['PATH_INFO'] == '/favicon.ico'
         return [404, {'Content-Type' => 'text/html'}, []]
       end
