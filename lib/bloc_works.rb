@@ -23,14 +23,18 @@ require "bloc_works/controller"
 module BlocWorks
   class Application
     def call(env)
+      puts "********** env **********:     #{env}"
       if env['PATH_INFO'] != '/favicon.ico'
-        controller_class, action_name = controller_and_action(env)
-        if !controller_class.nil?
-          controller = controller_class.new(env)
+        puts "********** controller_and_action(env) **********:     #{controller_and_action(env)}"
+        puts " after controller_and_action(env)"
+
+        controller_name, action_name = controller_and_action(env)
+        if !controller_name.nil?
+          controller = controller_name.new(env)
 
           if controller.respond_to?(action_name)
-            body = controller.send(action_name)
-            return [200, {'Content-Type' => 'text/html'}, [body]]
+            text = controller.send(action_name)
+            return [200, {'Content-Type' => 'text/html'}, [text]]
           end
         end
       end
