@@ -16,13 +16,13 @@ module BlocWorks
       # puts "%%%%%%%%%%%%"
       # puts " #{eruby.result(locals.merge(env: @env))}"
       # puts "%%%%%%%%%%%%"
-      #eruby.result(locals.merge(env: @env))
+      eruby.result(locals.merge(env: @env))
 
-      self.instance_variables.each do |instance_variable_name|
-        locals[instance_variable_name] = self.instance_variable_get(instance_variable_name)
-      end
-
-      eruby.result(locals)
+      # self.instance_variables.each do |instance_variable_name|
+      #   locals[instance_variable_name] = self.instance_variable_get(instance_variable_name)
+      # end
+      #
+      # eruby.result(locals)
     end
 
 
