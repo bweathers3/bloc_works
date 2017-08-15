@@ -92,7 +92,7 @@ module BlocWorks
       #     :options=>{:default=>{}}
       #   })
         #
-      puts "@rules second set:    #{@rules}"
+      #puts "@rules second set:    #{@rules}"
     end
 
     def look_up_url(url)
