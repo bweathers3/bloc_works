@@ -8,4 +8,4 @@
 /spec/reports/
 /tmp/
 
-*.gem
+/bloc_works-?.?.?.gem
