@@ -65,6 +65,16 @@ module BlocWorks
     end
 
     def render(*args)
+      arg1, arg2 = args
+      if arg1.nil?
+        response(create_response_array("Welcome", arg2))
+      else
+        # puts " in render with args of #{args}"
+        response(create_response_array(*args))
+      end
+    end
+
+    def redirect(*args)
       # puts " in render with args of #{args}"
       response(create_response_array(*args))
     end

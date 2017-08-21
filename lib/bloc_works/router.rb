@@ -47,97 +47,48 @@ module BlocWorks
     end
 
     def map(url, *args)
-      #puts "\n<router.rb> BlocWorks::Router.map(url, *args)\nBEFORE url: #{url}, *args: #{args}\n"
-      options = {}
-      options = args.pop if args[-1].is_a?(Hash)
-      options[:default] ||= {}
+      puts "\n<router.rb> BlocWorks::Router.map(url, *args)\nBEFORE url: #{url}, *args: #{args}\n"
 
-      destination = nil
-      destination = args.pop if args.size > 0
-      raise "Too many args!" if args.size > 0
+      options = get_options(args)
+      destination = check_destination(args)
+      parts_info = parts_work(url)
 
-      parts = url.split("/")
-      parts.reject! { |part| part.empty? }
+      regex = parts_info[1].join("/")
 
-      vars, regex_parts = [], []
-
-      parts.each do |part|
-        case part[0]
-        when ":"
-          vars << part[1..-1]
-          regex_parts << "([a-zA-Z0-9]+)"
-        when "*"
-          vars << part[1..-1]
-          regex_parts << "(.*)"
-        else
-          regex_parts << part
-        end
-      end
-
-      regex = regex_parts.join("/")
       @rules.push({ regex: Regexp.new("^/#{regex}\/?$"),
-                   vars: vars, destination: destination,
+                   vars: parts_info[0], destination: destination,
                    options: options })
-      # puts "\n<router.rb> BlocWorks::Router.map(url, *args)\nAFTER regex: #{regex}, vars: #{vars}, destination: #{destination}, options: #{options}\n"
-      # @rules.push({
-      #     regex: Regexp.new("/books/index"),
-      #     :vars=>[],
-      #     :destination=>"books#index",
-      #     :options=>{:default=>{}}
-      #   })
-      # @rules.push({
-      #     regex: Regexp.new("/books/"),
-      #     :vars=>[],
-      #     :destination=>"books#index",
-      #     :options=>{:default=>{}}
-      #   })
-        #
-      #puts "@rules second set:    #{@rules}"
+      puts "@rules second set:    #{@rules.last}"
     end
 
     def look_up_url(url)
        #puts "\n<router.rb> BlocWorks::Router.look_up_url(url) (1)\nurl: #{url}\n"
-
       @rules.each do |rule|
         rule_match = rule[:regex].match(url)
         # puts "\n<router.rb> BlocWorks::Router.look_up_url(url) (2)\nrule: #{rule}, rule_match: #{rule_match}\n"
 
-        # we do not have a rule to match the /books/index pattern
-        # binding.pry
-
         if rule_match
           options = rule[:options]
-          params = options[:default].dup
-          # puts "\n<router.rb> BlocWorks::Router.look_up_url(url) (3)\noptions: #{options}, params: #{params}\n"
-          rule[:vars].each_with_index do |var, index|
-            params[var] = rule_match.captures[index]
-            # puts "\n<router.rb> BlocWorks::Router.look_up_url(url) (4)\nvar: #{var}, index: #{index}, params[var]: #{params[var]}\n"
+            # puts "\n<router.rb> BlocWorks::Router.look_up_url(url) (5)\nrule[:destination]: #{rule[:destination]}\n"
+          params = get_params(rule, rule_match, options)
+
+          unless rule[:destination]
+            rule[:destination] = "#{params["controller"]}##{params["action"]}"
           end
 
-          if rule[:destination]
-            # puts "\n<router.rb> BlocWorks::Router.look_up_url(url) (5)\nrule[:destination]: #{rule[:destination]}\n"
-            return get_destination(rule[:destination], params)
-          else
-            controller = params["controller"]
-            action = params["action"]
-            # puts "\n<router.rb> BlocWorks::Router.look_up_url(url) (6)\ncontroller: #{controller}, action: #{action}"
-            return get_destination("#{controller}##{action}", params)
-          end
+          return get_destination(rule[:destination], params)
+
         end
       end
     end
 
-    # def resources(controller)
-    #     ## Note there is also a map functions in blocBooks::config.ru
-    #     ## Richard added the code below
-    #       map ":controller/:id", default: { "action" => "show" }
-    #       map ":controller", default: { "action" => "index" }
-    #       map ":controller", default: { "action" => "new" }
-    #       map ":controller/:id", default: { "action" => "edit" }
-    #       map ":controller/:id", default: { "action" => "update" }
-    #       map ":controller", default: { "action" => "create" }
-    #       map ":controller/:id", default: { "action" => "destroy" }
-    # end
+    def resources(controller)
+      map "", "#{controller}#welcome"
+      map ":controller/:id/:action"
+      map ":controller/:id", default: {"action" => "show"}
+      map ":controller", default: {"action" => "index"}
+    end
+
 
     def get_destination(destination, routing_params = {})
        #puts "\n<router.rb> BlocWorks::Router.get_destination(destination, routing_params = {})\ndestination: #{destination}, routing_params: #{routing_params}\n"
@@ -154,5 +105,63 @@ module BlocWorks
       end
       raise "Destination no found: #{destination}"
     end
+
+    def get_options(args)
+      options = {}
+      options = args.pop if args[-1].is_a?(Hash)
+      options[:default] ||= {}
+      return options
+    end
+
+    def check_destination(args)
+      destination = nil
+      destination = args.pop if args.size > 0
+      raise "Too many args!" if args.size > 0
+      return destination
+    end
+
+    def parts_work(url)
+      parts = url.split("/")
+      parts.reject! { |part| part.empty? }
+
+      parts_info, vars, regex_parts = [], [], []
+
+      parts.each do |part|
+        case part[0]
+        when ":"
+          vars << part[1..-1]
+          regex_parts << "([a-zA-Z0-9]+)"
+        when "*"
+          vars << part[1..-1]
+          regex_parts << "(.*)"
+        else
+          regex_parts << part
+        end
+      end
+      parts_info[0], parts_info[1] = vars, regex_parts
+      return parts_info
+    end
+
+    def get_params(rule, rule_match, options)
+      params = options[:default].dup
+
+      rule[:vars].each_with_index do |var, index|
+        params[var] = rule_match.captures[index]
+      end
+      params
+    end
+
   end
 end
+
+
+#Richards code
+# map ":controller/:id", default: { "action" => "show" }
+# map ":controller", default: { "action" => "index" }
+# map ":controller/", default: { "action" => "new" }
+# map ":controller/:id", default: { "action" => "edit" }
+# map ":controller/:id", default: { "action" => "update" }
+# map ":controller", default: { "action" => "create" }
+# map ":controller/:id", default: { "action" => "destroy" }
+# map ":controller/:id/:action"
+# map ":controller/:action"
